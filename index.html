@@ -1,52 +1,289 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#11121a">
-<title>یادآور بی‌صدا</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101116">
+<title>پلیر موسیقی</title>
 <style>
-:root{color-scheme:dark;--bg:#11121a;--panel:#1d1f2a;--line:#343747;--text:#f5f5fa;--muted:#a9acbb;--accent:#9b7cff}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#30264b 0,#11121a 55%);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
-main{width:min(620px,100%);margin:auto;padding:28px 16px 44px}header{display:flex;align-items:center;gap:12px;margin-bottom:22px}.logo{width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,#b69dff,#6c4bd4);display:grid;place-items:center;font-size:23px}
-h1{font-size:21px;margin:0}.sub{color:var(--muted);font-size:12px;margin-top:4px}.card{background:#1d1f2aee;border:1px solid var(--line);border-radius:20px;padding:18px;margin:14px 0;box-shadow:0 12px 35px #0003}
-h2{font-size:16px;margin:0 0 14px}label{display:block;font-size:12px;color:var(--muted);margin:12px 0 7px}
-input,textarea,select{width:100%;background:#12141c;border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--text);font:inherit;outline:none}
-input:focus,textarea:focus,select:focus{border-color:var(--accent)}textarea{resize:vertical;min-height:76px}.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
-button{border:0;border-radius:12px;padding:12px 15px;font:inherit;font-weight:650;cursor:pointer}.primary{background:linear-gradient(135deg,#b49aff,#7452e1);color:white;width:100%;margin-top:15px}
-.secondary{background:#303342;color:var(--text)}.danger{background:#422c38;color:#ffc6d5}.hint{font-size:11px;color:var(--muted);line-height:1.9;margin:12px 2px 0}
-.status{padding:11px 13px;background:#29253a;border:1px solid #51436f;border-radius:12px;font-size:12px;line-height:1.8;margin-top:12px}
-.item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}.iteminfo{flex:1;min-width:0}.itemtitle{font-size:13px;font-weight:650;overflow-wrap:anywhere}.itemmeta{font-size:11px;color:var(--muted);margin-top:4px}
-.empty{color:var(--muted);font-size:12px;text-align:center;padding:18px 5px}.pill{font-size:10px;color:#d6caff;background:#39304f;border-radius:99px;padding:5px 8px;white-space:nowrap}
-</style></head>
-<body><main>
-<header><div class="logo">♧</div><div><h1>یادآور بی‌صدا</h1><div class="sub">نمونه مستقل برای اضافه‌شدن به موزیک‌پلیر</div></div></header>
+:root{color-scheme:dark;--bg:#101116;--panel:#1b1d26;--panel2:#242733;--text:#f4f4f7;--muted:#a5a7b4;--accent:#9b7cff;--accent2:#6c50d9;--line:#303340}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#25203c 0,#101116 48%);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
+.wrap{width:min(720px,100%);margin:auto;padding:24px 16px 40px}
+header{display:flex;align-items:center;justify-content:space-between;margin:8px 0 22px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#b49aff,#6847d6);display:grid;place-items:center;font-size:24px;box-shadow:0 8px 28px #7658dd55}
+h1{font-size:21px;margin:0}.sub{color:var(--muted);font-size:12px;margin-top:3px}
+.pill{border:1px solid var(--line);border-radius:99px;padding:7px 11px;color:var(--muted);font-size:11px}
+.card{background:#1b1d26eF;border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:16px;box-shadow:0 12px 35px #0003}
+.upload{border:1.5px dashed #65558e;background:#211d31;text-align:center;padding:20px 14px;cursor:pointer}
+.upload strong{display:block;margin:7px 0 3px}.upload small{color:var(--muted)}
+input[type=file]{display:none}
+.now{display:flex;align-items:center;gap:14px}.cover{width:76px;height:76px;flex:none;border-radius:18px;background:linear-gradient(145deg,#39314e,#171820);display:grid;place-items:center;font-size:31px}
+.trackname{font-weight:700;overflow-wrap:anywhere}.artist{font-size:12px;color:var(--muted);margin-top:5px}
+.progress{width:100%;accent-color:var(--accent);margin:18px 0 2px;direction:ltr}
+.times{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;direction:ltr}
+.controls{display:flex;align-items:center;justify-content:center;gap:17px;margin:17px 0 4px}
+button{font:inherit;color:var(--text);border:0;cursor:pointer}
+.ctrl{background:transparent;font-size:22px;width:42px;height:42px;border-radius:50%}
+.play{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#b49aff,#7452e1);font-size:24px;box-shadow:0 7px 22px #7452e155}
+.active{color:#c2adff!important;background:#39304f!important}
+.sectionhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.sectionhead h2{font-size:16px;margin:0}.count{color:var(--muted);font-size:12px}
+.songlist{display:flex;flex-direction:column;gap:8px}.song{display:flex;align-items:center;gap:11px;background:var(--panel2);padding:11px;border-radius:14px;min-width:0}
+.songicon{width:39px;height:39px;flex:none;border-radius:12px;background:#353044;display:grid;place-items:center}
+.songinfo{min-width:0;flex:1}.songtitle{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.songmeta{font-size:11px;color:var(--muted);margin-top:4px}
+.song button{background:transparent;color:var(--muted);padding:7px;font-size:17px}.song.playing{outline:1px solid #8e72e9}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:22px 8px;line-height:1.9}
+.note{color:var(--muted);font-size:11px;line-height:1.9;margin:12px 3px 0}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#303142;padding:10px 16px;border-radius:12px;font-size:12px;opacity:0;pointer-events:none;transition:.2s;max-width:90%;text-align:center}.toast.show{opacity:1}
+@media(min-width:600px){.wrap{padding-top:34px}.card{padding:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <div class="brand"><div class="logo">♫</div><div><h1>موزیک‌پلیر</h1><div class="sub">کتابخانه موسیقی شخصی تو</div></div></div>
+ <span class="pill">ذخیره روی همین دستگاه</span>
+</header>
+
+<label class="card upload" for="files">
+ <div style="font-size:28px">＋</div><strong>افزودن آهنگ</strong><small>یک یا چند فایل صوتی از گوشی انتخاب کن</small>
+</label>
+<input id="files" type="file" accept="audio/*,.mp3,.m4a,.wav,.ogg,.aac,.flac" multiple>
+
 <section class="card">
-<h2>ساخت یادآور</h2>
-<label for="message">متن اعلان</label><textarea id="message" maxlength="180" placeholder="مثلاً: وقت بیدار شدنه! روز خوبی داشته باشی 🌞"></textarea>
-<div class="row"><div><label for="date">تاریخ</label><input id="date" type="date"></div><div><label for="time">ساعت</label><input id="time" type="time" value="07:00"></div></div>
-<label for="repeat">تکرار</label><select id="repeat"><option value="once">فقط یک‌بار</option><option value="daily">هر روز</option></select>
-<button class="primary" id="add">＋ ذخیره یادآور</button>
-<div class="status" id="permission">وضعیت اعلان: هنوز بررسی نشده. برای دریافت اعلان باید اجازه مرورگر را فعال کنی.</div>
-<p class="hint">این نسخه فعلاً نمونه رابط کاربری و آزمایش اعلان است. زمان‌بندی قابل‌اعتماد در زمان بسته‌بودن سایت یا Chrome به سرویس Push و سرور زمان‌بندی نیاز دارد و در این فایلِ تنها فعال نیست.</p>
+ <div class="sectionhead"><h2>در حال پخش</h2><span class="count" id="status">آماده</span></div>
+ <div class="now">
+  <div class="cover">♫</div>
+  <div style="min-width:0"><div class="trackname" id="currentTitle">هنوز آهنگی انتخاب نشده</div><div class="artist" id="currentSub">از کتابخانه یک آهنگ پخش کن</div></div>
+ </div>
+ <input class="progress" id="seek" type="range" min="0" max="1000" value="0">
+ <div class="times"><span id="elapsed">0:00</span><span id="duration">0:00</span></div>
+ <div class="controls">
+  <button class="ctrl" id="repeat" title="تکرار همین آهنگ" aria-label="تکرار">↻</button>
+  <button class="ctrl" id="prev" title="قبلی" aria-label="قبلی">⏮</button>
+  <button class="play" id="play" title="پخش یا توقف" aria-label="پخش">▶</button>
+  <button class="ctrl" id="next" title="بعدی" aria-label="بعدی">⏭</button>
+  <button class="ctrl" id="stop" title="توقف کامل" aria-label="توقف">■</button>
+ </div>
+ <div class="note">برای نمایش کنترل در اعلان گوشی، پخش را از همین صفحه شروع کن. در صورت پشتیبانی Chrome، کنترل‌ها در اعلان و صفحه قفل هم ظاهر می‌شوند.</div>
 </section>
-<section class="card"><h2>یادآورهای من</h2><div id="items"><div class="empty">هنوز یادآوری ثبت نکردی.</div></div></section>
-<section class="card"><h2>آزمایش اعلان</h2><p class="hint">با زدن دکمه زیر، مرورگر اجازه اعلان می‌خواهد و یک اعلان آزمایشی نمایش می‌دهد. بی‌صدا بودن آن به تنظیمات گوشی و مرورگر هم بستگی دارد.</p><button class="secondary" id="test" style="width:100%;margin-top:12px">نمایش اعلان آزمایشی</button></section>
-<p class="hint">یادآورها در حافظه همین مرورگر ذخیره می‌شوند. پاک‌کردن داده‌های سایت می‌تواند آن‌ها را حذف کند. این فایل برای تست رابط است و هنوز به سایت موزیک‌پلیر متصل نشده.</p>
-</main>
+
+<section class="card">
+ <div class="sectionhead"><h2>کتابخانه من</h2><span class="count" id="count">۰ آهنگ</span></div>
+ <div class="songlist" id="list"><div class="empty">هنوز آهنگی اضافه نکردی.<br>از دکمه «افزودن آهنگ» شروع کن.</div></div>
+</section>
+<div class="note">فایل‌ها در حافظه مرورگر همین دستگاه ذخیره می‌شوند؛ پاک‌کردن داده‌های سایت یا مرورگر ممکن است آن‌ها را حذف کند. این نسخه به اینترنت یا سرور نیاز ندارد.</div>
+
+<section class="card" id="reminderCard">
+ <div class="sectionhead"><h2>یادآورهای بی‌صدا</h2><span class="count" id="reminderStatus">در حال بررسی…</span></div>
+ <label for="reminderMessage" style="display:block;color:var(--muted);font-size:12px;margin:10px 0 7px">متن اعلان</label>
+ <input id="reminderMessage" type="text" maxlength="180" placeholder="مثلاً: وقت استراحته 🌿" style="width:100%;background:#12141c;border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--text);font:inherit">
+ <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+  <div style="flex:1;min-width:130px"><label for="reminderDate" style="display:block;color:var(--muted);font-size:12px;margin:0 0 7px">تاریخ</label><input id="reminderDate" type="date" style="width:100%;background:#12141c;border:1px solid var(--line);border-radius:12px;padding:11px;color:var(--text);font:inherit"></div>
+  <div style="flex:1;min-width:110px"><label for="reminderTime" style="display:block;color:var(--muted);font-size:12px;margin:0 0 7px">ساعت</label><input id="reminderTime" type="time" value="07:00" style="width:100%;background:#12141c;border:1px solid var(--line);border-radius:12px;padding:11px;color:var(--text);font:inherit"></div>
+ </div>
+ <label for="reminderRepeat" style="display:block;color:var(--muted);font-size:12px;margin:10px 0 7px">تکرار</label>
+ <select id="reminderRepeat" style="width:100%;background:#12141c;border:1px solid var(--line);border-radius:12px;padding:11px;color:var(--text);font:inherit"><option value="once">فقط یک‌بار</option><option value="daily">هر روز</option></select>
+ <button id="saveReminder" style="width:100%;margin-top:12px;border-radius:12px;padding:12px;background:linear-gradient(135deg,#b49aff,#7452e1);color:white;font:inherit;font-weight:700">＋ ذخیره یادآور</button>
+ <button id="testReminder" style="width:100%;margin-top:9px;border-radius:12px;padding:12px;background:#303342;color:var(--text);font:inherit">نمایش اعلان آزمایشی</button>
+ <div id="reminderInfo" class="note">برای اعلان آزمایشی، اجازه اعلان را فعال کن. اگر صفحه در پس‌زمینه باشد و Chrome باز بماند، زمان‌بندی این نسخه تلاش می‌کند اعلان را نشان دهد.</div>
+ <div id="reminderList" style="margin-top:12px"></div>
+</section>
+
+</div>
+<div class="toast" id="toast"></div>
+<audio id="audio" preload="metadata"></audio>
+<script>
+(() => {
+ const DB_NAME='personal-music-player', STORE='tracks', DB_VERSION=1;
+ const audio=document.getElementById('audio');
+ const $=id=>document.getElementById(id);
+ let db, tracks=[], currentId=null, objectUrl=null, repeat=false, seeking=false;
+
+ function openDB(){return new Promise((resolve,reject)=>{
+  const req=indexedDB.open(DB_NAME,DB_VERSION);
+  req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains(STORE))d.createObjectStore(STORE,{keyPath:'id'});};
+  req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
+ });}
+ function tx(mode='readonly'){return db.transaction(STORE,mode).objectStore(STORE);}
+ function allTracks(){return new Promise((resolve,reject)=>{const r=tx().getAll();r.onsuccess=()=>resolve(r.result.sort((a,b)=>a.added-b.added));r.onerror=()=>reject(r.error);});}
+ function saveTrack(t){return new Promise((resolve,reject)=>{const r=tx('readwrite').put(t);r.onsuccess=resolve;r.onerror=()=>reject(r.error);});}
+ function removeTrack(id){return new Promise((resolve,reject)=>{const r=tx('readwrite').delete(id);r.onsuccess=resolve;r.onerror=()=>reject(r.error);});}
+ function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600);}
+ function fmt(s){if(!Number.isFinite(s))return '0:00';s=Math.floor(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+ function current(){return tracks.find(t=>t.id===currentId);}
+ function render(){
+  $('count').textContent=tracks.length.toLocaleString('fa-IR')+' آهنگ';
+  const list=$('list');list.innerHTML='';
+  if(!tracks.length){list.innerHTML='<div class="empty">هنوز آهنگی اضافه نکردی.<br>از دکمه «افزودن آهنگ» شروع کن.</div>';return;}
+  tracks.forEach(t=>{
+   const row=document.createElement('div');row.className='song'+(t.id===currentId?' playing':'');
+   const icon=document.createElement('div');icon.className='songicon';icon.textContent='♫';
+   const info=document.createElement('div');info.className='songinfo';
+   const title=document.createElement('div');title.className='songtitle';title.textContent=t.name;
+   const meta=document.createElement('div');meta.className='songmeta';meta.textContent=t.size?sizeText(t.size):'فایل صوتی';
+   info.append(title,meta);
+   const playBtn=document.createElement('button');playBtn.textContent=t.id===currentId&&!audio.paused?'Ⅱ':'▶';playBtn.title='پخش';
+   playBtn.onclick=()=>t.id===currentId?togglePlay():playTrack(t.id);
+   const del=document.createElement('button');del.textContent='×';del.title='حذف از کتابخانه';
+   del.onclick=async()=>{if(t.id===currentId){audio.pause();audio.removeAttribute('src');audio.load();currentId=null;clearUrl();updateNow();}await removeTrack(t.id);await refresh();toast('آهنگ از کتابخانه حذف شد');};
+   row.append(icon,info,playBtn,del);list.append(row);
+  });
+ }
+ function sizeText(n){return n<1048576?(n/1024).toFixed(0)+' KB':(n/1048576).toFixed(1)+' MB';}
+ async function refresh(){tracks=await allTracks();render();}
+ function clearUrl(){if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;}}
+ function updateNow(){
+  const t=current();$('currentTitle').textContent=t?t.name:'هنوز آهنگی انتخاب نشده';
+  $('currentSub').textContent=t?'ذخیره‌شده در کتابخانه':'از کتابخانه یک آهنگ پخش کن';
+  $('play').textContent=audio.paused?'▶':'Ⅱ';$('status').textContent=t?(audio.paused?'متوقف':'در حال پخش'):'آماده';
+  $('repeat').classList.toggle('active',repeat);
+  if('mediaSession' in navigator && t){
+   try{navigator.mediaSession.metadata=new MediaMetadata({title:t.name,artist:'کتابخانه موسیقی من',album:'موزیک‌پلیر'});}catch(e){}
+   navigator.mediaSession.playbackState=audio.paused?'paused':'playing';
+  }
+  render();
+ }
+ async function playTrack(id){
+  const t=tracks.find(x=>x.id===id);if(!t)return;
+  try{
+   audio.pause();clearUrl();currentId=id;objectUrl=URL.createObjectURL(t.blob);audio.src=objectUrl;audio.load();
+   await audio.play();updateNow();toast('در حال پخش: '+t.name);
+  }catch(e){updateNow();toast('پخش انجام نشد؛ یک بار دیگر روی دکمه پخش بزن.');}
+ }
+ async function togglePlay(){
+  if(!currentId){if(tracks[0])return playTrack(tracks[0].id);toast('اول یک آهنگ اضافه کن');return;}
+  if(audio.paused){try{await audio.play();}catch(e){toast('برای شروع پخش دوباره لمس کن');}}
+  else audio.pause();
+  updateNow();
+ }
+ function step(dir){
+  if(!tracks.length)return;
+  let i=tracks.findIndex(t=>t.id===currentId);i=i<0?0:(i+dir+tracks.length)%tracks.length;
+  playTrack(tracks[i].id);
+ }
+ $('files').addEventListener('change',async e=>{
+  const files=[...e.target.files];if(!files.length)return;
+  let added=0;
+  for(const f of files){
+   if(!f.type.startsWith('audio/')&&!/\.(mp3|m4a|wav|ogg|aac|flac)$/i.test(f.name))continue;
+   try{await saveTrack({id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random(),name:f.name.replace(/\.[^.]+$/,''),blob:f,size:f.size,added:Date.now()+added});added++;}
+   catch(err){toast('فضای ذخیره‌سازی کافی نیست یا مرورگر اجازه ذخیره نداد.');break;}
+  }
+  await refresh();e.target.value='';toast(added?added+' آهنگ ذخیره شد':'فایلی اضافه نشد');
+ });
+ $('play').onclick=togglePlay;$('prev').onclick=()=>step(-1);$('next').onclick=()=>step(1);
+ $('stop').onclick=()=>{audio.pause();audio.currentTime=0;updateNow();};
+ $('repeat').onclick=()=>{repeat=!repeat;audio.loop=repeat;updateNow();toast(repeat?'تکرار آهنگ روشن شد':'تکرار آهنگ خاموش شد');};
+ audio.addEventListener('play',updateNow);audio.addEventListener('pause',updateNow);
+ audio.addEventListener('loadedmetadata',()=>{$('duration').textContent=fmt(audio.duration);});
+ audio.addEventListener('timeupdate',()=>{if(!seeking){$('seek').value=audio.duration?Math.round(audio.currentTime/audio.duration*1000):0;}$('elapsed').textContent=fmt(audio.currentTime);});
+ audio.addEventListener('ended',()=>{if(!repeat)step(1);});
+ $('seek').addEventListener('input',()=>{seeking=true;});
+ $('seek').addEventListener('change',()=>{if(audio.duration)audio.currentTime=(Number($('seek').value)/1000)*audio.duration;seeking=false;});
+ if('mediaSession' in navigator){
+  try{
+   navigator.mediaSession.setActionHandler('play',()=>audio.play());
+   navigator.mediaSession.setActionHandler('pause',()=>audio.pause());
+   navigator.mediaSession.setActionHandler('previoustrack',()=>step(-1));
+   navigator.mediaSession.setActionHandler('nexttrack',()=>step(1));
+   navigator.mediaSession.setActionHandler('seekto',d=>{if(Number.isFinite(d.seekTime))audio.currentTime=d.seekTime;});
+  }catch(e){}
+ }
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden && current())updateNow();});
+ (async()=>{try{db=await openDB();await refresh();}catch(e){toast('مرورگر امکان ذخیره‌سازی را فعال نکرده است.');}})();
+})();
+</script>
+
 <script>
 (()=>{
-const $=id=>document.getElementById(id),KEY='silent-reminder-prototype-v1';
-const today=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')};
-$('date').value=today();$('date').min=today();
-let reminders=[];try{reminders=JSON.parse(localStorage.getItem(KEY)||'[]')}catch{}
-const save=()=>localStorage.setItem(KEY,JSON.stringify(reminders));
-const faDate=s=>new Date(s+'T00:00:00').toLocaleDateString('fa-IR');
-function render(){const root=$('items');root.innerHTML='';if(!reminders.length){root.innerHTML='<div class="empty">هنوز یادآوری ثبت نکردی.</div>';return}
-reminders.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
-reminders.forEach(r=>{const el=document.createElement('div');el.className='item';const info=document.createElement('div');info.className='iteminfo';const title=document.createElement('div');title.className='itemtitle';title.textContent=r.message;const meta=document.createElement('div');meta.className='itemmeta';meta.textContent=faDate(r.date)+' • '+r.time+' • '+(r.repeat==='daily'?'هر روز':'یک‌بار');info.append(title,meta);const tag=document.createElement('span');tag.className='pill';tag.textContent='ذخیره‌شده';const del=document.createElement('button');del.className='danger';del.textContent='حذف';del.onclick=()=>{reminders=reminders.filter(x=>x.id!==r.id);save();render()};el.append(info,tag,del);root.append(el)})}
-async function askPermission(){if(!('Notification'in window)){$('permission').textContent='این مرورگر از اعلان وب پشتیبانی نمی‌کند.';return false}let p=Notification.permission;if(p==='default')p=await Notification.requestPermission();$('permission').textContent=p==='granted'?'اجازه اعلان فعال است.':p==='denied'?'اجازه اعلان رد شده؛ از تنظیمات سایت آن را فعال کن.':'اجازه اعلان داده نشد.';return p==='granted'}
-$('add').onclick=async()=>{const message=$('message').value.trim(),date=$('date').value,time=$('time').value;if(!message||!date||!time){alert('متن، تاریخ و ساعت را کامل کن.');return}if(date<today()){alert('تاریخ باید امروز یا بعد از امروز باشد.');return}
-reminders.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2),message,date,time,repeat:$('repeat').value});save();render();$('message').value='';await askPermission();alert('یادآور ذخیره شد. در این نسخه، اعلان در زمان تعیین‌شده حتی با بسته‌بودن سایت ارسال نمی‌شود؛ این بخش پس از اتصال سرویس Push فعال خواهد شد.')};
-$('test').onclick=async()=>{if(await askPermission()){try{new Notification('یادآور بی‌صدا',{body:'اعلان آزمایشی با موفقیت نمایش داده شد.',silent:true,tag:'reminder-test'})}catch(e){alert('نمایش اعلان ممکن نشد.')}}};
-render();
+ const $=id=>document.getElementById(id);
+ const KEY='music-player-reminders-v2';
+ let items=[];
+ try{items=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){items=[]}
+ const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+ $('reminderDate').value=today();$('reminderDate').min=today();
+ const save=()=>localStorage.setItem(KEY,JSON.stringify(items));
+ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ async function getReg(){
+  if(!('serviceWorker' in navigator)) throw new Error('این مرورگر Service Worker را پشتیبانی نمی‌کند.');
+  const reg=await navigator.serviceWorker.register('./sw.js');
+  await navigator.serviceWorker.ready;
+  return reg;
+ }
+ async function permission(){
+  if(!('Notification' in window)) throw new Error('اعلان وب در این مرورگر پشتیبانی نمی‌شود.');
+  let p=Notification.permission;
+  if(p==='default') p=await Notification.requestPermission();
+  if(p!=='granted') throw new Error('اجازه اعلان فعال نیست؛ تنظیمات اعلان سایت را بررسی کن.');
+  return p;
+ }
+ async function notify(title,body,tag){
+  await permission();
+  const reg=await getReg();
+  await reg.showNotification(title,{body,tag,silent:true,renotify:false});
+ }
+ function render(){
+  const root=$('reminderList');root.innerHTML='';
+  if(!items.length){root.innerHTML='<div class="empty">هنوز یادآوری ثبت نکردی.</div>';return;}
+  items.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  for(const r of items){
+   const row=document.createElement('div');row.className='song';
+   const info=document.createElement('div');info.className='songinfo';
+   const title=document.createElement('div');title.className='songtitle';title.textContent=r.message;
+   const meta=document.createElement('div');meta.className='songmeta';meta.textContent=`${r.date} • ${r.time} • ${r.repeat==='daily'?'هر روز':'یک‌بار'}`;
+   info.append(title,meta);
+   const del=document.createElement('button');del.textContent='حذف';del.title='حذف یادآور';del.onclick=()=>{items=items.filter(x=>x.id!==r.id);save();render();};
+   row.append(info,del);root.append(row);
+  }
+ }
+ function nextDate(r){
+  const [y,m,d]=r.date.split('-').map(Number),[hh,mm]=r.time.split(':').map(Number);
+  return new Date(y,m-1,d,hh,mm,0,0).getTime();
+ }
+ let checking=false;
+ async function checkDue(){
+  if(checking)return;checking=true;
+  try{
+   const now=Date.now();let changed=false;
+   for(const r of [...items]){
+    const due=nextDate(r);
+    if(due<=now && !r.sent){
+     await notify('یادآور بی‌صدا',r.message,'reminder-'+r.id);
+     if(r.repeat==='daily'){
+      const d=new Date(due);d.setDate(d.getDate()+1);
+      r.date=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      r.sent=false;
+     }else{items=items.filter(x=>x.id!==r.id)}
+     changed=true;
+    }
+   }
+   if(changed){save();render();}
+  }catch(e){$('reminderInfo').textContent=e.message||'ارسال اعلان انجام نشد.';}
+  finally{checking=false;}
+ }
+ $('saveReminder').onclick=async()=>{
+  const message=$('reminderMessage').value.trim(),date=$('reminderDate').value,time=$('reminderTime').value;
+  if(!message||!date||!time){$('reminderInfo').textContent='متن، تاریخ و ساعت را کامل کن.';return;}
+  if(date<today()){ $('reminderInfo').textContent='تاریخ باید امروز یا بعد از امروز باشد.';return; }
+  try{
+   await permission();await getReg();
+   items.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2),message,date,time,repeat:$('reminderRepeat').value,sent:false});
+   save();render();$('reminderMessage').value='';
+   $('reminderInfo').textContent='یادآور ذخیره شد. تا وقتی این صفحه در یک تب باز باشد، حتی در پس‌زمینه، برای زمانش اعلان بررسی می‌شود.';
+  }catch(e){$('reminderInfo').textContent=e.message||'ثبت یادآور ناموفق بود.';}
+ };
+ $('testReminder').onclick=async()=>{
+  try{await notify('اعلان آزمایشی','اعلان سایت درست کار می‌کند.','reminder-test-'+Date.now());$('reminderInfo').textContent='درخواست نمایش اعلان آزمایشی با موفقیت به Chrome داده شد.';}
+  catch(e){$('reminderInfo').textContent=e.message||'نمایش اعلان ممکن نشد.';}
+ };
+ async function init(){
+  try{await getReg();$('reminderStatus').textContent=Notification.permission==='granted'?'اعلان فعال':'اجازه اعلان لازم است';}
+  catch(e){$('reminderStatus').textContent='نیازمند بررسی';}
+  render();checkDue();setInterval(checkDue,15000);
+ }
+ init();
 })();
-</script></body></html>
+</script>
+
+</body>
+  </html>
