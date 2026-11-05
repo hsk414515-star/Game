@@ -204,41 +204,63 @@ button{font:inherit;color:var(--text);border:0;cursor:pointer}
  $('reminderDate').value=today();$('reminderDate').min=today();
  const save=()=>localStorage.setItem(KEY,JSON.stringify(items));
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function timestamp(date,time){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!/^\d{2}:\d{2}$/.test(time))return NaN;
+  const [y,m,d]=date.split('-').map(Number),[hh,mm]=time.split(':').map(Number);
+  const value=new Date(y,m-1,d,hh,mm,0,0);
+  if(value.getFullYear()!==y||value.getMonth()!==m-1||value.getDate()!==d||value.getHours()!==hh||value.getMinutes()!==mm)return NaN;
+  return value.getTime();
+ }
+ function dateTimeFrom(ts){const d=new Date(ts);return {date:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`,time:`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`};}
+ const escText=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  async function getReg(){
   if(!('serviceWorker' in navigator)) throw new Error('این مرورگر Service Worker را پشتیبانی نمی‌کند.');
-  const reg=await navigator.serviceWorker.register('./sw.js');
-  await navigator.serviceWorker.ready;
-  return reg;
+  await navigator.serviceWorker.register('./sw.js');
+  return await navigator.serviceWorker.ready;
  }
  async function permission(){
   if(!('Notification' in window)) throw new Error('اعلان وب در این مرورگر پشتیبانی نمی‌شود.');
   let p=Notification.permission;
-  if(p==='default') p=await Notification.requestPermission();
-  if(p!=='granted') throw new Error('اجازه اعلان فعال نیست؛ تنظیمات اعلان سایت را بررسی کن.');
-  return p;
+  if(p==='default')p=await Notification.requestPermission();
+  if(p!=='granted')throw new Error('اجازه اعلان فعال نیست؛ تنظیمات اعلان سایت را بررسی کن.');
  }
  async function notify(title,body,tag){
   await permission();
   const reg=await getReg();
   await reg.showNotification(title,{body,tag,silent:true,renotify:false});
  }
+ // مهاجرت یادآورهای نسخه قبلی: یادآورهای یک‌باره‌ای که زمانشان گذشته،
+ // به‌اشتباه بلافاصله اعلان نمی‌فرستند. یادآور روزانه به نوبت بعدی می‌رود.
+ let migrated=false;
+ for(const r of items){
+  if(!Number.isFinite(r.dueAt)){
+   let due=timestamp(r.date,r.time);
+   if(!Number.isFinite(due)){r.missed=true;migrated=true;continue;}
+   if(due<=Date.now()){
+    if(r.repeat==='daily'){
+     const d=new Date(due);
+     while(d.getTime()<=Date.now())d.setDate(d.getDate()+1);
+     due=d.getTime();Object.assign(r,dateTimeFrom(due));
+    }else{r.missed=true;}
+   }
+   r.dueAt=due;migrated=true;
+  }
+ }
+ if(migrated)save();
  function render(){
   const root=$('reminderList');root.innerHTML='';
   if(!items.length){root.innerHTML='<div class="empty">هنوز یادآوری ثبت نکردی.</div>';return;}
-  items.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  items.sort((a,b)=>(a.dueAt||0)-(b.dueAt||0));
   for(const r of items){
    const row=document.createElement('div');row.className='song';
    const info=document.createElement('div');info.className='songinfo';
    const title=document.createElement('div');title.className='songtitle';title.textContent=r.message;
-   const meta=document.createElement('div');meta.className='songmeta';meta.textContent=`${r.date} • ${r.time} • ${r.repeat==='daily'?'هر روز':'یک‌بار'}`;
+   const meta=document.createElement('div');meta.className='songmeta';
+   meta.textContent=`${r.date} • ${r.time} • ${r.repeat==='daily'?'هر روز':'یک‌بار'}${r.missed?' • زمان گذشته':''}`;
    info.append(title,meta);
    const del=document.createElement('button');del.textContent='حذف';del.title='حذف یادآور';del.onclick=()=>{items=items.filter(x=>x.id!==r.id);save();render();};
    row.append(info,del);root.append(row);
   }
- }
- function nextDate(r){
-  const [y,m,d]=r.date.split('-').map(Number),[hh,mm]=r.time.split(':').map(Number);
-  return new Date(y,m-1,d,hh,mm,0,0).getTime();
  }
  let checking=false;
  async function checkDue(){
@@ -246,30 +268,31 @@ button{font:inherit;color:var(--text);border:0;cursor:pointer}
   try{
    const now=Date.now();let changed=false;
    for(const r of [...items]){
-    const due=nextDate(r);
-    if(due<=now && !r.sent){
-     await notify('یادآور بی‌صدا',r.message,'reminder-'+r.id);
-     if(r.repeat==='daily'){
-      const d=new Date(due);d.setDate(d.getDate()+1);
-      r.date=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-      r.sent=false;
-     }else{items=items.filter(x=>x.id!==r.id)}
-     changed=true;
-    }
+    if(r.missed||!Number.isFinite(r.dueAt)||r.dueAt>now)continue;
+    await notify('یادآور بی‌صدا',r.message,'reminder-'+r.id);
+    if(r.repeat==='daily'){
+     const d=new Date(r.dueAt);d.setDate(d.getDate()+1);
+     r.dueAt=d.getTime();Object.assign(r,dateTimeFrom(r.dueAt));
+    }else{items=items.filter(x=>x.id!==r.id);}
+    changed=true;
    }
    if(changed){save();render();}
   }catch(e){$('reminderInfo').textContent=e.message||'ارسال اعلان انجام نشد.';}
   finally{checking=false;}
  }
  $('saveReminder').onclick=async()=>{
-  const message=$('reminderMessage').value.trim(),date=$('reminderDate').value,time=$('reminderTime').value;
+  const message=$('reminderMessage').value.trim(),date=$('reminderDate').value,time=$('reminderTime').value,repeat=$('reminderRepeat').value;
   if(!message||!date||!time){$('reminderInfo').textContent='متن، تاریخ و ساعت را کامل کن.';return;}
-  if(date<today()){ $('reminderInfo').textContent='تاریخ باید امروز یا بعد از امروز باشد.';return; }
+  const dueAt=timestamp(date,time);
+  if(!Number.isFinite(dueAt)){ $('reminderInfo').textContent='تاریخ یا ساعت معتبر نیست.';return; }
+  if(dueAt<=Date.now()){$('reminderInfo').textContent='این ساعت گذشته؛ لطفاً یک ساعت در آینده انتخاب کن.';return;}
   try{
    await permission();await getReg();
-   items.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2),message,date,time,repeat:$('reminderRepeat').value,sent:false});
+   // زمان را دوباره بررسی می‌کنیم تا در صورت طولانی‌شدن گرفتن اجازه، اعلان فوری نشود.
+   if(dueAt<=Date.now()){$('reminderInfo').textContent='تا زمان انتخابی خیلی کم مانده و گذشته است؛ یک ساعت دیرتر انتخاب کن.';return;}
+   items.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2),message,date,time,repeat,dueAt,missed:false});
    save();render();$('reminderMessage').value='';
-   $('reminderInfo').textContent='یادآور ذخیره شد. تا وقتی این صفحه در یک تب باز باشد، حتی در پس‌زمینه، برای زمانش اعلان بررسی می‌شود.';
+   $('reminderInfo').textContent='یادآور ذخیره شد؛ اعلان فقط در زمان انتخاب‌شده بررسی می‌شود.';
   }catch(e){$('reminderInfo').textContent=e.message||'ثبت یادآور ناموفق بود.';}
  };
  $('testReminder').onclick=async()=>{
@@ -286,4 +309,4 @@ button{font:inherit;color:var(--text);border:0;cursor:pointer}
 </script>
 
 </body>
-  </html>
+</html>
