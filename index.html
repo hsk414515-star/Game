@@ -302,7 +302,20 @@ button{font:inherit;color:var(--text);border:0;cursor:pointer}
  async function init(){
   try{await getReg();$('reminderStatus').textContent=Notification.permission==='granted'?'اعلان فعال':'اجازه اعلان لازم است';}
   catch(e){$('reminderStatus').textContent='نیازمند بررسی';}
-  render();checkDue();setInterval(checkDue,15000);
+  render();
+  checkDue();
+
+  // بررسی سریع‌تر هنگام باز بودن صفحه؛ Chrome/Android ممکن است در پس‌زمینه
+  // اجرای تایمرهای صفحه را محدود یا متوقف کند.
+  setInterval(checkDue,5000);
+
+  // اگر کاربر به تب برگردد یا صفحه دوباره فعال شود، یادآورهای سررسیدشده
+  // بدون منتظر ماندن برای نوبت بعدی بررسی می‌شوند.
+  document.addEventListener('visibilitychange',()=>{
+   if(!document.hidden) checkDue();
+  });
+  window.addEventListener('focus',checkDue);
+  window.addEventListener('pageshow',checkDue);
  }
  init();
 })();
